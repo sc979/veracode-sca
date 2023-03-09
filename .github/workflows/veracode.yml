@@ -17,8 +17,8 @@ jobs:
       with:
         java-version: 1.8
   
-    - name: Build with Maven
-      run: mvn -f app/pom.xml clean package 
+    
+    - run: zip -r veracode-scan-target.zip ./ 
 
     - name: Get the Java API wrapper
       uses: wei/curl@master
@@ -26,4 +26,14 @@ jobs:
         args: -sS -o VeracodeJavaAPI.jar "https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/19.6.5.8/vosp-api-wrappers-java-19.6.5.8.jar"
 
     - name: Start SAST scan
-      run: java -jar VeracodeJavaAPI.jar -action uploadandscan -vid "${{secrets.VERACODE_API_ID}}" -vkey "${{secrets.VERACODE_API_KEY}}" -appname Github-VVscan -createprofile true -version "GitHub Actions job $GITHUB_RUN_NUMBER" -filepath ./app/target/verademo.war
+      run: java -jar VeracodeJavaAPI.jar -action uploadandscan -vid "${{secrets.VERACODE_API_ID}}" -vkey "${{secrets.VERACODE_API_KEY}}" -appname Github-VVscan -createprofile true -version "GitHub Actions job $GITHUB_RUN_NUMBER" --file veracode-scan-target.zip
+      continue-on-error: true
+    - name: Convert pipeline scan output to SARIF format
+      id: convert
+      uses: veracode/veracode-pipeline-scan-results-to-sarif@ff08ae5b45d5384cb4679932f184c013d34da9be
+      with:
+        pipeline-results-json: results.json
+    - uses: github/codeql-action/upload-sarif@v2
+      with:
+        # Path to SARIF file relative to the root of the repository
+        sarif_file: veracode-results.sarif
