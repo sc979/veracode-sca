@@ -24,5 +24,5 @@ jobs:
       with:
         args: -sS -o VeracodeJavaAPI.jar "https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/19.6.5.8/vosp-api-wrappers-java-19.6.5.8.jar"
 
-    - name: Start SAST scan
-      run: java -jar VeracodeJavaAPI.jar -action uploadandscan -vid "${{secrets.VERACODE_API_ID}}" -vkey "${{secrets.VERACODE_API_KEY}}" -appname Github-Mayank-SCA-scan -createprofile true -version "GitHub Actions job $GITHUB_RUN_NUMBER" -filepath ./veracode-scan-target.zip
+    - name: Run Veracode SCA
+      run: java -jar VeracodeJavaAPI.jar -action uploadandscan -vid "${{secrets.VERACODE_API_ID}}" -vkey "${{secrets.VERACODE_API_KEY}}" -appname Github-Mayank-SCA-scan_June -createprofile true -version "GitHub Actions job $GITHUB_RUN_NUMBER" -filepath ./veracode-scan-target.zip
